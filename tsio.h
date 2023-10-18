@@ -38,27 +38,27 @@ class tsi
 	std::istream& operator>>(T& t) = delete;
 };*/
 
-//extern std::mutex p;
+// extern std::mutex p;
 
-template<std::istream& I, std::ostream& O> //, class charT = char, class traits = std::char_traits<charT>>
-class tsio  //: std::basic_ostream<charT, traits>
+template <std::istream &I, std::ostream &O> //, class charT = char, class traits = std::char_traits<charT>>
+class tsio									//: std::basic_ostream<charT, traits>
 {
 private:
 	std::mutex printlock, buflock;
 	std::stringstream buf;
-	//using ostr = std::basic_ostream<charT, traits>;
+	// using ostr = std::basic_ostream<charT, traits>;
 protected:
 public:
 	template <typename T>
-	std::ostream& operator<<(const T& t)
+	std::ostream &operator<<(const T &t)
 	{
-		std::unique_lock<std::mutex> lock (buflock);
+		std::unique_lock<std::mutex> lock(buflock);
 		buf << t;
 		return O;
 	}
-	std::ostream& operator<<(std::ostream& (*f)(std::ostream&))
+	std::ostream &operator<<(std::ostream &(*f)(std::ostream &))
 	{
-		std::unique_lock<std::mutex> lock (printlock);
+		std::unique_lock<std::mutex> lock(printlock);
 		O << f;
 		O << buf.str();
 		buf.str("");
@@ -81,7 +81,7 @@ public:
 		va_end(l);
 		return ret;
 	}*/
-	std::mutex& mutex()
+	std::mutex &mutex()
 	{
 		return printlock;
 	}
@@ -93,18 +93,17 @@ public:
 	}
 };
 
-//template <class charT, class traits>
+// template <class charT, class traits>
 /*template <std::istream& I, std::ostream& O>
 tsio& sync(tsio& os)
 {
 }*/
 
-//template <std::istream& I, std::ostream& O>
-//std::mutex tsio<I, O>::p;
+// template <std::istream& I, std::ostream& O>
+// std::mutex tsio<I, O>::p;
 
-
-//#define ts 	cout
-//extern tsio<std::cin, std::cout> ts;
+// #define ts 	cout
+// extern tsio<std::cin, std::cout> ts;
 
 /*template <typename T>
 	ostr& operator<<(const T& t)
@@ -137,16 +136,16 @@ tsio& sync(tsio& os)
 		I >> t;
 		return I;
 	}*/
-	/*int lprintf(const char* format, ...) noexcept
-	{
-		char tbuf[1024];
-		int ret;
-		va_list l;
-		va_start(l, format);
-		ret = vsnprintf(tbuf, 1024, format, l);
-		va_end(l);
-		buf << tbuf;
-		return ret;
-	}*/
+/*int lprintf(const char* format, ...) noexcept
+{
+	char tbuf[1024];
+	int ret;
+	va_list l;
+	va_start(l, format);
+	ret = vsnprintf(tbuf, 1024, format, l);
+	va_end(l);
+	buf << tbuf;
+	return ret;
+}*/
 
 #endif

@@ -40,12 +40,14 @@ namespace picalc
 	{
 		size_t precision;
 		unsigned int threads;
-		run_info() \
+		run_info()
 			: precision(0), threads(0)
-		{ }
-		run_info(unsigned int p, unsigned int t) \
+		{
+		}
+		run_info(unsigned int p, unsigned int t)
 			: precision(p), threads(t)
-		{ }
+		{
+		}
 	};
 
 	class cache
@@ -55,6 +57,7 @@ namespace picalc
 		std::map<unsigned long, mpfr::mpreal> fac;
 		std::mutex fac_lock;
 		run_info info;
+
 	public:
 		/*friend std::ostream& operator<<(std::ostream& out, const cache& p)
 		{
@@ -68,19 +71,19 @@ namespace picalc
 			if (fac.find(k) == fac.end())
 			{
 				mpfr::mpreal tmp = mpfr::fac_ui(k);
-				std::unique_lock<std::mutex> lock (fac_lock);
+				std::unique_lock<std::mutex> lock(fac_lock);
 				fac.insert(std::pair<unsigned long, mpfr::mpreal>(k, tmp));
 			}
 			if (fac.find(3 * k) == fac.end())
 			{
 				mpfr::mpreal tmp = mpfr::fac_ui(3 * k);
-				std::unique_lock<std::mutex> lock (fac_lock);
+				std::unique_lock<std::mutex> lock(fac_lock);
 				fac.insert(std::pair<unsigned long, mpfr::mpreal>(3 * k, tmp));
 			}
 			if (fac.find(6 * k) == fac.end())
 			{
 				mpfr::mpreal tmp = mpfr::fac_ui(6 * k);
-				std::unique_lock<std::mutex> lock (fac_lock);
+				std::unique_lock<std::mutex> lock(fac_lock);
 				fac.insert(std::pair<unsigned long, mpfr::mpreal>(6 * k, tmp));
 			}
 		}
@@ -97,14 +100,14 @@ namespace picalc
 			mpfr::mpreal::set_default_prec(info.precision);
 
 			num += k;
-			std::vector<std::thread> t (info.threads);
+			std::vector<std::thread> t(info.threads);
 
 			auto start = std::chrono::high_resolution_clock::now();
 
 			for (unsigned long phase = 0; phase < info.threads; phase++)
 			{
-				t[phase] = std::thread( [&] (const unsigned long ph)
-				{
+				t[phase] = std::thread([&](const unsigned long ph)
+									   {
 					if (ph == 0)
 					{
 						for (unsigned long j = ph; j <= num; j += info.threads)
@@ -137,8 +140,8 @@ namespace picalc
 						}
 					}
 
-					mpfr_free_cache();
-				}, phase );
+					mpfr_free_cache(); },
+									   phase);
 			}
 
 			join_all(t);
@@ -209,14 +212,14 @@ namespace picalc
 			{
 				if (n >= t)
 				{
-					//r = mpfr::mod(b * r, k);
+					// r = mpfr::mod(b * r, k);
 					r = fmod(b * r, k);
 					n = n - t;
 				}
 				t /= 2.0;
 				if (t >= 1.0)
 				{
-					//r = mpfr::mod(mpfr::pow(r, 2.0), k);
+					// r = mpfr::mod(mpfr::pow(r, 2.0), k);
 					r = fmod(pow(r, 2.0), k);
 				}
 				else
@@ -227,33 +230,30 @@ namespace picalc
 		double sum_for(const long n, const long j) const
 		{
 			double sum = 0;
-			//std::cout << "n " << n << " j " << j << std::endl;
+			// std::cout << "n " << n << " j " << j << std::endl;
 
 			for (long k = 0; k <= n; k++)
 			{
-				//sum += mpfr::mod(mpfr::pow(16, n - k), (8 * k) + j) / ((8 * k) + j);
-				//sum += exp_mod(16.0, n - k, (8.0 * k) + j) / ((8.0 * k) + j);
+				// sum += mpfr::mod(mpfr::pow(16, n - k), (8 * k) + j) / ((8 * k) + j);
+				// sum += exp_mod(16.0, n - k, (8.0 * k) + j) / ((8.0 * k) + j);
 				sum += better_exp_mod(16, n - k, (8.0 * k) + j) / ((8.0 * k) + j);
-				//std::cout << exp_mod(16.0, n - k, (8.0 * k) + j) / ((8.0 * k) + j) << std::endl;
+				// std::cout << exp_mod(16.0, n - k, (8.0 * k) + j) / ((8.0 * k) + j) << std::endl;
 			}
-			//std::cout << "sum == " << sum << std::endl;
+			// std::cout << "sum == " << sum << std::endl;
 			for (long k = n + 1; k <= n + 8; k++)
 			{
-				sum +=  pow(16.0, n - k) / (8.0 * k + j);
-			//std::cout << "pow == " << pow(16.0, n - k) << " n - k == " << (signed long)(n - k) << std::endl;
+				sum += pow(16.0, n - k) / (8.0 * k + j);
+				// std::cout << "pow == " << pow(16.0, n - k) << " n - k == " << (signed long)(n - k) << std::endl;
 			}
-			//std::cout << "sum == " << sum << std::endl;
+			// std::cout << "sum == " << sum << std::endl;
 
 			return sum;
 		}
 		double bbp_for(const long n) const
 		{
-			double		a =	(4.0 * sum_for(n, 1.0)) \
-					-	(2.0 * sum_for(n, 4.0)) \
-					-	(1.0 * sum_for(n, 5.0)) \
-					-	(1.0 * sum_for(n, 6.0));
+			double a = (4.0 * sum_for(n, 1.0)) - (2.0 * sum_for(n, 4.0)) - (1.0 * sum_for(n, 5.0)) - (1.0 * sum_for(n, 6.0));
 			a -= floor(a);
-			//std::cout << "a == " << a << std::endl;
+			// std::cout << "a == " << a << std::endl;
 			return a;
 		}
 		static inline unsigned long long hex_at(mpfr::mpreal r, const unsigned int k, const unsigned int len = 8)
@@ -262,9 +262,9 @@ namespace picalc
 			{
 				throw std::out_of_range("The limit for hex_at is  std::numeric_limits<signed long long>::max()  , usually (2 ^ 64) / 2. Please do not use lengths greater than 15.");
 			}
-			//std::cout << "__ 1 __" << std::hex << std::endl;
+			// std::cout << "__ 1 __" << std::hex << std::endl;
 
-			//unsigned
+			// unsigned
 
 			r -= mpfr::trunc(r);
 			mpfr::mpreal tmp = r;
@@ -272,35 +272,36 @@ namespace picalc
 			for (;;)
 			{
 				r *= 16;
-				//r = ldexp(r, 4); // *= 16
+				// r = ldexp(r, 4); // *= 16
 				result.append(to_string<unsigned int>((unsigned long)mpfr::trunc(r).toULong(), std::hex));
 				r -= mpfr::trunc(r);
 				if (r == 0.0)
 					break;
 			}
-			//std::cout << "__ 3 __" << std::hex << std::endl;
+			// std::cout << "__ 3 __" << std::hex << std::endl;
 
-			//std::cout.precision(8);
-			//std::cout << "__ 1 __" << std::hex << std::endl;
-			//std::cout << "a ### " << std::hex << result << std::endl;
-			//std::cout << "__ 2 __" << std::hex << std::endl;
-			//std::cout << "b ### " << std::dec << " at index " << k << " for len of " << len << std::endl;
-			//std::cout << "__ 3 __" << std::hex << std::endl;
-			//std::cout << "c ### " << result.substr(k, len) << " at index " << k << " for len of " << len << std::endl;
-			//std::cout << "__ 4 __" << std::hex << std::endl;
+			// std::cout.precision(8);
+			// std::cout << "__ 1 __" << std::hex << std::endl;
+			// std::cout << "a ### " << std::hex << result << std::endl;
+			// std::cout << "__ 2 __" << std::hex << std::endl;
+			// std::cout << "b ### " << std::dec << " at index " << k << " for len of " << len << std::endl;
+			// std::cout << "__ 3 __" << std::hex << std::endl;
+			// std::cout << "c ### " << result.substr(k, len) << " at index " << k << " for len of " << len << std::endl;
+			// std::cout << "__ 4 __" << std::hex << std::endl;
 
-			//std::cout << "__ 3 __" << std::hex << std::endl;
+			// std::cout << "__ 3 __" << std::hex << std::endl;
 			unsigned long long ret;
 			try
 			{
-			//	std::cout << std::dec << "k == " << k << " size == " << result.size() << std::endl;
+				//	std::cout << std::dec << "k == " << k << " size == " << result.size() << std::endl;
 				std::string str = result.substr(k, len);
-			//std::cout << "__ 4 __" << std::hex << std::endl;
+				// std::cout << "__ 4 __" << std::hex << std::endl;
 				ret = std::stoll(str, nullptr, 16);
 			}
 			catch (...) // (std::out_of_range& oor)
 			{
-				std::cerr << std::endl << "##############" << std::endl;
+				std::cerr << std::endl
+						  << "##############" << std::endl;
 				std::cerr << "Fatal error in program logic." << std::endl;
 				std::cerr << "The limit for hex_at is  >>>  std::numeric_limits<unsigned long long>::max()  <<<  , usually (2 ^ 64) / 2." << std::endl;
 				std::cerr << "Debug output (If you see this, create a debug report at Github) ### <" << result.substr(k, len) << "> at index <" << k << "> for len of <" << len << "> while result size is <" << result.size() << ">" << std::endl;
@@ -331,15 +332,15 @@ namespace picalc
 			c.fast_factorial(k);
 			try
 			{
-				a = mpfr::pow(-1.0, k) *					\
-				(c.lookup(6 * k)	/					\
-				(c.lookup(3 * k) * mpfr::pow(c.lookup(k), 3.0)))		\
-				*								\
-				(((k * 545140134.0) + 13591409.0) / mpfr::pow(640320.0, 3.0 * k));
+				a = mpfr::pow(-1.0, k) *
+					(c.lookup(6 * k) /
+					 (c.lookup(3 * k) * mpfr::pow(c.lookup(k), 3.0))) *
+					(((k * 545140134.0) + 13591409.0) / mpfr::pow(640320.0, 3.0 * k));
 			}
-			catch (std::out_of_range& oor)
+			catch (std::out_of_range &oor)
 			{
-				std::cerr << std::endl << "##############" << std::endl;
+				std::cerr << std::endl
+						  << "##############" << std::endl;
 				std::cerr << "Fatal error in program logic." << std::endl;
 				std::cerr << "Debug output (If you see this, create a debug report at Github) ### index is <" << k << ">" << std::endl;
 				throw;
@@ -354,6 +355,7 @@ namespace picalc
 			sum = pow(sum, -1.0);
 			return sum;
 		}
+
 	protected:
 	public:
 		void calculate(const unsigned int runs, const std::string verification_mode, unsigned long digits)
@@ -363,9 +365,11 @@ namespace picalc
 
 			std::cout << std::dec << " __ Default == " << mpfr::mpreal::get_default_prec() << " __ " << std::endl;
 
-// Log(151931373056000) / Log(10) = 14.181647462725477655...
+			// Log(151931373056000) / Log(10) = 14.181647462725477655...
 
-			std::cout << std::endl << "##############" << std::endl << "Precalculating..." << std::endl;
+			std::cout << std::endl
+					  << "##############" << std::endl
+					  << "Precalculating..." << std::endl;
 
 			c.caching_precalculate(runs);
 
@@ -373,11 +377,11 @@ namespace picalc
 
 			auto start = std::chrono::high_resolution_clock::now();
 
-			std::vector<std::thread> t (info.threads);
+			std::vector<std::thread> t(info.threads);
 			for (unsigned int phase = 0; phase < info.threads; phase++)
 			{
-				t[phase] = std::thread( [&] (unsigned int ph)
-				{
+				t[phase] = std::thread([&](unsigned int ph)
+									   {
 					if (ph == 0)
 					{
 						for (unsigned int k = ph; k <= runs; k += info.threads)
@@ -424,8 +428,8 @@ namespace picalc
 						}
 					}
 
-					mpfr_free_cache();
-				}, phase );
+					mpfr_free_cache(); },
+									   phase);
 			}
 
 			join_all(t);
@@ -453,7 +457,7 @@ namespace picalc
 			}*/
 
 			std::cout << "##############" << std::endl;
-(void)digits;
+			(void)digits;
 			if (verification_mode == "full")
 			{
 				unsigned long correct_digits = 0;
@@ -485,7 +489,7 @@ namespace picalc
 					else
 						break;
 				}
-				//incorrect_digits -= pi.toString().size();
+				// incorrect_digits -= pi.toString().size();
 				std::cout << std::dec << "Incorrect digits (counted from the end): " << incorrect_digits << std::endl;
 				std::cout << "Buffer Length: " << pi.toString().size() << std::endl;
 				std::cout.precision(4);
@@ -497,9 +501,8 @@ namespace picalc
 			ss.precision(1024);
 			ss << pi;
 
-			//std::cout.precision(1024);
+			// std::cout.precision(1024);
 			std::cout << ss.str() << std::endl;
-
 
 			mpfr_free_cache();
 		}
@@ -514,7 +517,7 @@ namespace picalc
 	class pi
 	{
 	private:
-		//bool finished;
+		// bool finished;
 	public:
 		/*friend std::ostream& operator<<(std::ostream& out, const pi& p) noexcept
 		{
@@ -568,10 +571,9 @@ namespace picalc
 			} while (prog < 1);
 			print_percent(1);
 			f.wait();*/
-			//t.join();
-			//cout << endl << "All threads are finished." << endl;
-			//finished = true;
-
+		// t.join();
+		// cout << endl << "All threads are finished." << endl;
+		// finished = true;
 	};
 }
 

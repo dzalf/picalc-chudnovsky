@@ -25,9 +25,9 @@
 
 using namespace std;
 
-void join_all(vector<thread>& v)
+void join_all(vector<thread> &v)
 {
-	for (auto& t : v)
+	for (auto &t : v)
 		if (t.joinable())
 			t.join();
 }
@@ -56,8 +56,8 @@ void clear_line()
 	printf("\033[J");
 }
 
-template<typename T>
-void print_percent(const T a, const T b) noexcept
+template <typename T, typename U>
+void print_percent(const T a, const U b) noexcept
 {
 	double rel = (double)a / (double)b;
 	rel *= 100;
@@ -100,4 +100,3 @@ void print_percent(double rel) noexcept
 template void print_percent<int>(int, int);
 template void print_percent<unsigned int>(unsigned int, unsigned int);
 template void print_percent<unsigned long>(unsigned long, unsigned long);
-

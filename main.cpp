@@ -40,7 +40,7 @@ public:
 	{
 		return "verification mode";
 	}
-	bool check(const std::string& value) const
+	bool check(const std::string &value) const
 	{
 		if (value == "full" || value == "normal" || value == "none")
 			return true;
@@ -49,18 +49,26 @@ public:
 	}
 };
 
-void handle_sigint(int) {
-    enable_cursor(); cout << endl; exit(1);
-}
-
-void handle_sigsegv(int) {
-    enable_cursor(); cout << endl << "Recieved SIGSEGV" << endl; exit(1); 
-}
-
-int main(int argc, char* argv[])
+void handle_sigint(int)
 {
-	atexit([] () { enable_cursor(); cout << endl; });
-	signal(SIGINT,  static_cast<__sighandler_t>(&handle_sigint));
+	enable_cursor();
+	cout << endl;
+	exit(1);
+}
+
+void handle_sigsegv(int)
+{
+	enable_cursor();
+	cout << endl
+		 << "Recieved SIGSEGV" << endl;
+	exit(1);
+}
+
+int main(int argc, char *argv[])
+{
+	atexit([]()
+		   { enable_cursor(); cout << endl; });
+	signal(SIGINT, static_cast<__sighandler_t>(&handle_sigint));
 	signal(SIGSEGV, static_cast<__sighandler_t>(&handle_sigsegv));
 
 	picalc::run_info r;
@@ -72,18 +80,18 @@ int main(int argc, char* argv[])
 	{
 		TCLAP::CmdLine cmd("An arbitrary precision pi calculator using C++(11) and the multiple-precision floating-point library (MPFR).", '=', "0.1");
 
-		TCLAP::ValueArg<unsigned long> threadc_arg("j", "jobs", "number of threads to use", \
-			false, thread::hardware_concurrency(), "number", cmd);
+		TCLAP::ValueArg<unsigned long> threadc_arg("j", "jobs", "number of threads to use",
+												   false, thread::hardware_concurrency(), "number", cmd);
 
-		TCLAP::ValueArg<unsigned long> digits_arg("d", "digits", "number of digits to calculate", \
-			false, 1000, "number", cmd);
+		TCLAP::ValueArg<unsigned long> digits_arg("d", "digits", "number of digits to calculate",
+												  false, 1000, "number", cmd);
 
-		TCLAP::ValueArg<std::string> verification_arg("v", "verify", "verification mode", \
-			false, "normal", new VerificationModeString(), cmd);
+		TCLAP::ValueArg<std::string> verification_arg("v", "verify", "verification mode",
+													  false, "normal", new VerificationModeString(), cmd);
 
-	//	TCLAP::SwitchArg reverseSwitch("r","reverse","Print name backwards", cmd, false);
+		//	TCLAP::SwitchArg reverseSwitch("r","reverse","Print name backwards", cmd, false);
 
-// Log(151931373056000) / Log(10) = 14.181647462725477655..
+		// Log(151931373056000) / Log(10) = 14.181647462725477655..
 
 		// Parse the argv array.
 		cmd.parse(argc, argv);
@@ -95,17 +103,18 @@ int main(int argc, char* argv[])
 		r.precision = mpfr::digits2bits(digits + 200);
 		verification_mode = verification_arg.getValue();
 	}
-	catch (TCLAP::ArgException &e)  // catch any exceptions
+	catch (TCLAP::ArgException &e) // catch any exceptions
 	{
 		std::cerr << "Error while parsing arguments: " << e.error() << " for argument " << e.argId() << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	cout << "picalc-chudnovsky\tCopyright (C) 2013-2020 Tobias Markus" << endl <<
-		"This program comes with ABSOLUTELY NO WARRANTY." << endl <<
-		"This is free software, and you are welcome to redistribute it" << endl <<
-		"under certain conditions; for more information, visit" << endl <<
-		"https://github.com/hesiod/picalc-chudnovsky" << endl << endl;
+	cout << "picalc-chudnovsky\tCopyright (C) 2013-2020 Tobias Markus" << endl
+		 << "This program comes with ABSOLUTELY NO WARRANTY." << endl
+		 << "This is free software, and you are welcome to redistribute it" << endl
+		 << "under certain conditions; for more information, visit" << endl
+		 << "https://github.com/hesiod/picalc-chudnovsky" << endl
+		 << endl;
 
 	mpfr::mpreal::set_default_prec(r.precision);
 
@@ -116,11 +125,11 @@ int main(int argc, char* argv[])
 
 	picalc::pi p(r, runc, verification_mode, digits);
 
-	//p.calculate(runc);
+	// p.calculate(runc);
 
-	//cout << p << endl;
+	// cout << p << endl;
 
-	//cout << p.digits() << endl;
+	// cout << p.digits() << endl;
 
 	return EXIT_SUCCESS;
 }

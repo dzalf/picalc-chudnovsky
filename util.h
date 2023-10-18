@@ -36,18 +36,19 @@
 	return tmp;
 }*/
 
-template<typename T>
-std::string to_string(T t, std::ios_base & (*f)(std::ios_base&))
+template <typename T>
+std::string to_string(T t, std::ios_base &(*f)(std::ios_base &))
 {
 	std::ostringstream oss;
 	oss << f << t;
 	return oss.str();
 }
 
-template<typename T> void print_percent(const T a, const T b) noexcept;
+template <typename T, typename U>
+void print_percent(const T a, const U b) noexcept;
 void print_percent(double rel) noexcept;
 
-void join_all(std::vector<std::thread>& v);
+void join_all(std::vector<std::thread> &v);
 
 void enable_cursor();
 void disable_cursor();

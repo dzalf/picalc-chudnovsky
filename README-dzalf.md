@@ -1,38 +1,38 @@
-
 **Preparation**
 
 _This guide was prepared using Ubuntu 22.04.2 LTS on WSL2 for Windows_
 
 1. Clone this repository and enter the folder
-`https://github.com/dzalf/picalc-chudnovsky.git`
+   `https://github.com/dzalf/picalc-chudnovsky.git`
 
 2. Update and upgrade distribution
-`sudo apt-get update && sudo apt-get upgrade -y`
+   `sudo apt-get update && sudo apt-get upgrade -y`
 
-2. [Optional] Install micro editor (better than Nano :wink:)
-`sudo apt install micro`
+3. [Optional] Install micro editor (better than Nano :wink:)
+   `sudo apt install micro`
 
 **Installing prerequisites**
 
 1. Install g++/gcc development libraries, cmake and pkg-config
-`sudo apt install build-essential cmake pkg-config`
+   `sudo apt install build-essential cmake pkg-config`
 
 2. Install MPFR through the [Ubuntu Package](https://launchpad.net/ubuntu/+source/mpfrc%2B%2B):
-`sudo apt install libmpfrc++-dev`
+   `sudo apt install libmpfrc++-dev`
 
 3. Install the [MPFR C++ header]()https://github.com/advanpix/mpreal_ (cloning the repo)
+
 ```
 git clone https://github.com/advanpix/mpreal
 ```
 
 4. Install [ncurses](https://en.wikipedia.org/wiki/Ncurses)
-`sudo apt-get install libncurses5-dev libncursesw5-dev`
+   `sudo apt-get install libncurses5-dev libncursesw5-dev`
 
 5. Install [tclap](https://launchpad.net/ubuntu/+source/tclap)
-`sudo apt install libtclap-dev`
+   `sudo apt install libtclap-dev`
 
 6. Install meson (includes ninja)
-`sudo apt install meson`
+   `sudo apt install meson`
 
 **Compilation**
 
@@ -48,7 +48,6 @@ If some modifications are made, recompile with:
 
 `meson build --reconfigure`
 
-
 **Extras**
 
 1. Upgrading gcc:
@@ -60,10 +59,10 @@ https://mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-13.2.0/
 Modified `util.h` header file:
 
 ```cpp
-	
+
 	// util.h
 	template <typename T, typename U> void print_percent(const T a, const U b) noexcept;
-	
+
 	// util.cpp
 	template <typename T, typename U>
 	void print_percent(const T a, const T b) noexcept
